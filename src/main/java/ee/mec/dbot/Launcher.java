@@ -1,6 +1,6 @@
 package ee.mec.dbot;
 
-import ee.mec.dbot.listener.EditListener;
+import ee.mec.dbot.listener.MessageEventListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.tinylog.Logger;
@@ -20,7 +20,7 @@ public class Launcher {
 
         try {
             JDA jda = new JDABuilder(properties.get("token").toString())
-                    .addEventListeners(new EditListener())
+                    .addEventListeners(new MessageEventListener())
                     .build();
 
             jda.awaitReady();
