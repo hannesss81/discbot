@@ -1,7 +1,7 @@
 package ee.mec.dbot;
 
+import ee.mec.dbot.listener.MessageCachingListener;
 import ee.mec.dbot.listener.MessageEventListener;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.tinylog.Logger;
 
@@ -19,15 +19,13 @@ public class Launcher {
         var properties = loadProperties(PROPERTIES_FILE);
 
         try {
-            JDA jda = new JDABuilder(properties.get("token").toString())
+            new JDABuilder(properties.get("token").toString())
+                    .addEventListeners(new MessageCachingListener())
                     .addEventListeners(new MessageEventListener())
                     .build();
-
-            jda.awaitReady();
         } catch (LoginException e) {
             Logger.error(e, "Authentication failure.");
-        } catch (InterruptedException e) {
-            Logger.error(e, "Thread interrupted, shutting down.");
+            System.exit(1);
         }
     }
 

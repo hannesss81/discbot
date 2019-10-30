@@ -1,5 +1,6 @@
 package ee.mec.dbot.listener;
 
+import ee.mec.dbot.cache.MessageCache;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,14 +14,12 @@ import javax.annotation.Nonnull;
 
 public class MessageEventListener extends ListenerAdapter {
 
-    private final Map<Long, Message> latestMessages = new HashMap<>();
+    private final Map<Long, Long> userPrevMessageIds = new HashMap<>();
+    private MessageCache messageCache = MessageCache.getMessageCache();
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        Long authorId = event.getAuthor().getIdLong();
-        Message receivedMessage = event.getMessage();
-
-        latestMessages.put(authorId, receivedMessage);
+        userPrevMessageIds.put(event.getAuthor().getIdLong(), event.getMessageIdLong());
     }
 
     @Override
@@ -29,18 +28,25 @@ public class MessageEventListener extends ListenerAdapter {
 
         Long authorId = event.getAuthor().getIdLong();
         Message updatedMessage = event.getMessage();
-        Message oldMessage = latestMessages.get(authorId);
+        Message oldMessage = messageCache.getMessage(userPrevMessageIds.get(authorId));
 
         event.getChannel()
                 .sendMessageFormat("`%s`'s old message:\n", event.getAuthor().getName())
                 .appendFormat("`%s`", oldMessage.getContentStripped())
                 .queue();
 
-        latestMessages.put(authorId, updatedMessage);
+        userPrevMessageIds.put(authorId, updatedMessage.getIdLong());
     }
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
         Logger.info("Message delete event. {}", event);
+
+        Message deletedMessage = messageCache.getMessage(event.getMessageIdLong());
+
+        event.getChannel()
+                .sendMessageFormat("`%s` deleted a message!\n", deletedMessage.getAuthor().getName())
+                .appendFormat("`%s`", deletedMessage.getContentStripped())
+                .queue();
     }
 }
