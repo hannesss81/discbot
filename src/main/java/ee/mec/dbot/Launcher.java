@@ -22,8 +22,8 @@ public class Launcher {
     try {
       JDA jda =
           new JDABuilder(properties.get("token").toString())
-              .addEventListeners(new MessageStorageListener())
               .addEventListeners(new MessageEditDeleteListener())
+              .addEventListeners(new MessageStorageListener())
               .build();
       jda.awaitReady();
       hasStarted = true;
