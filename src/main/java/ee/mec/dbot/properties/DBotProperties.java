@@ -11,11 +11,13 @@ public class DBotProperties {
 
   private static final String PROPERTIES_FILE = "dbot.properties";
 
+  public static final String BOT_OWNER_ID;
   public static final String DISCORD_APP_TOKEN;
   public static final String MS_INSTANT_API_TOKEN;
 
   static {
     var props = loadProperties(PROPERTIES_FILE);
+    BOT_OWNER_ID = props.getProperty("bot-owner-id");
     DISCORD_APP_TOKEN = props.getProperty("discord-app-token");
     MS_INSTANT_API_TOKEN = props.getProperty("ms-instant-api-token");
   }

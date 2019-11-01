@@ -1,5 +1,8 @@
 package ee.mec.dbot;
 
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import ee.mec.dbot.command.InstantAnswerCommand;
 import ee.mec.dbot.listener.MessageEditDeleteListener;
 import ee.mec.dbot.listener.MessageStorageListener;
 import ee.mec.dbot.properties.DBotProperties;
@@ -18,6 +21,7 @@ public class Launcher {
           new JDABuilder(DBotProperties.DISCORD_APP_TOKEN)
               .addEventListeners(new MessageEditDeleteListener())
               .addEventListeners(new MessageStorageListener())
+              .addEventListeners(buildCommandListener())
               .build();
       jda.awaitReady();
       hasStarted = true;
@@ -32,5 +36,13 @@ public class Launcher {
       System.exit(1);
     }
     Logger.info("DBot is up and running!");
+  }
+
+  private static CommandClient buildCommandListener() {
+    return new CommandClientBuilder()
+        .setOwnerId(DBotProperties.BOT_OWNER_ID)
+        .setPrefix("!")
+        .addCommand(new InstantAnswerCommand())
+        .build();
   }
 }
